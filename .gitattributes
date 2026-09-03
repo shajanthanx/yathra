@@ -1,0 +1,10 @@
+# Keep line endings consistent regardless of each contributor's core.autocrlf.
+* text=auto eol=lf
+
+# Binary assets must never be normalised.
+*.png binary
+*.jpg binary
+*.ico binary
+*.ttf binary
+*.woff binary
+*.woff2 binary

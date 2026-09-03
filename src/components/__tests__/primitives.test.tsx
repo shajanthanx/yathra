@@ -162,8 +162,20 @@ describe('SubjectMark', () => {
     expect(screen.getByTestId('mark', hidden).props.accessibilityElementsHidden).toBe(true);
   });
 
-  it('accepts a tint override, which onboarding needs before a profile exists', () => {
-    renderUI(<SubjectMark subjectId="biology" tint="rose" testID="mark" />);
+  it('accepts a colour override, which onboarding needs before a profile exists', () => {
+    renderUI(
+      <SubjectMark
+        subjectId="biology"
+        palette={{
+          fill: '#ff5d8f',
+          onFill: '#050038',
+          graphic: '#b44175',
+          surface: '#ffeaf0',
+          onSurface: '#b44175',
+        }}
+        testID="mark"
+      />,
+    );
     expect(screen.getByText('BI', hidden)).toBeTruthy();
   });
 

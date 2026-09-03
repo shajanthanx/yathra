@@ -32,9 +32,25 @@ if (!browser) {
 }
 
 const args = process.argv.slice(2);
-const widthIndex = args.indexOf('--width');
-const width = Number(widthIndex === -1 ? 800 : args[widthIndex + 1]);
-const height = Math.round(width * 0.75);
+function flag(name, fallback) {
+  const index = args.indexOf(`--${name}`);
+  return index === -1 ? fallback : args[index + 1];
+}
+
+const width = Number(flag('width', '800'));
+const aspect = Number(flag('aspect', '0.62'));
+const height = Math.round(width * aspect);
+
+/**
+ * Which band of the artwork the hero shows.
+ *
+ * The illustration is a tall scene: plain sky at the top, the mountain ridge
+ * and clouds across the middle, dark foreground below. The hero only reveals a
+ * shallow strip of it — the rest is behind the inset card — so cropping to the
+ * ridge is what makes the artwork visible at all. Full artwork is
+ * "0 0 1604.2 1109.8".
+ */
+const viewBox = flag('viewbox', '0 470 1604.2 500');
 
 const assets = path.join(__dirname, '..', 'assets');
 const source = path.join(assets, 'sky.svg');
@@ -44,6 +60,7 @@ const output = path.join(assets, 'sky.png');
 const svg = fs
   .readFileSync(source, 'utf8')
   .replace(/<\?xml[^>]*\?>/, '')
+  .replace(/viewBox="[^"]*"/, `viewBox="${viewBox}"`)
   // Fill the viewport and crop, rather than letterboxing inside it.
   .replace('<svg ', '<svg preserveAspectRatio="xMidYMid slice" ');
 

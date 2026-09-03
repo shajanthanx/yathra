@@ -8,11 +8,10 @@
 import { Pressable, View, type ViewStyle } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { SubjectProgressSummary } from '@/domain/progress';
-import { useLocalize, useSubjectName, useSubjectTint } from '@/hooks/useContent';
+import { useLocalize, useSubjectName, useSubjectPalette } from '@/hooks/useContent';
 import { plural } from '@/i18n';
 import { percentValue } from '@/i18n/format';
 import { useT, useTheme } from '@/theme/ThemeProvider';
-import { tintPair } from '@/theme/tokens';
 import { ProgressBar } from './ProgressBar';
 import { SubjectMark } from './SubjectMark';
 import { Text } from './Text';
@@ -31,11 +30,11 @@ export function SubjectRow({ summary, onPress, color, last = false, style }: Sub
   const t = useT();
   const localize = useLocalize();
   const subjectName = useSubjectName();
-  const subjectTint = useSubjectTint();
+  const subjectPalette = useSubjectPalette();
 
   const name = subjectName(summary.subjectId);
   const percent = percentValue(summary.progress);
-  const barColor = color ?? tintPair(theme.colors, subjectTint(summary.subjectId)).foreground;
+  const barColor = color ?? subjectPalette(summary.subjectId).graphic;
   const focus = summary.focusTopic
     ? t('subjects.currentFocus', { topic: localize(summary.focusTopic.name) })
     : t('subjects.allDone');

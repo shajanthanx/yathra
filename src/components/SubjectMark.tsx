@@ -7,9 +7,9 @@
  * it is hidden from assistive technology rather than read out as initials.
  */
 import { View, type ViewStyle } from 'react-native';
-import { useSubjectMark, useSubjectTint } from '@/hooks/useContent';
+import { useSubjectMark, useSubjectPalette } from '@/hooks/useContent';
 import { useTheme } from '@/theme/ThemeProvider';
-import { tintPair, type TintKey } from '@/theme/tokens';
+import type { SubjectPalette } from '@/theme/tokens';
 import type { SubjectId } from '@/types/content';
 import { Text } from './Text';
 
@@ -34,21 +34,21 @@ export interface SubjectMarkProps {
   subjectId: SubjectId;
   size?: SubjectMarkSize;
   /**
-   * Overrides the tint the subject would get from the student's own subject
+   * Overrides the colour the subject would get from the student's own subject
    * order. Onboarding needs this: the profile does not exist yet, so every
-   * subject would otherwise resolve to the first tint.
+   * subject would otherwise resolve to the first colour.
    */
-  tint?: TintKey;
+  palette?: SubjectPalette;
   style?: ViewStyle;
   testID?: string;
 }
 
-export function SubjectMark({ subjectId, size = 'md', tint, style, testID }: SubjectMarkProps) {
+export function SubjectMark({ subjectId, size = 'md', palette, style, testID }: SubjectMarkProps) {
   const theme = useTheme();
   const subjectMark = useSubjectMark();
-  const subjectTint = useSubjectTint();
+  const subjectPalette = useSubjectPalette();
 
-  const pair = tintPair(theme.colors, tint ?? subjectTint(subjectId));
+  const colours = palette ?? subjectPalette(subjectId);
   const dimension = DIMENSION[size];
 
   return (
@@ -60,7 +60,7 @@ export function SubjectMark({ subjectId, size = 'md', tint, style, testID }: Sub
           width: dimension,
           height: dimension,
           borderRadius: size === 'sm' ? theme.radius.md : theme.radius.lg,
-          backgroundColor: pair.background,
+          backgroundColor: colours.fill,
           alignItems: 'center',
           justifyContent: 'center',
         },
@@ -70,7 +70,7 @@ export function SubjectMark({ subjectId, size = 'md', tint, style, testID }: Sub
     >
       <Text
         variant="micro"
-        color={pair.foreground}
+        color={colours.onFill}
         numberOfLines={1}
         // The mark is sized to the tile, so it must not grow with Dynamic Type.
         maxFontSizeMultiplier={1}

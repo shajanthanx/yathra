@@ -92,13 +92,23 @@ actually done — the fill is progress, the tick above it is the expected pace �
 what makes "on track" mean something rather than being a bare word. A tick is invisible
 to a screen reader, so the component also names both figures.
 
-**A colour per subject, used everywhere.** Each subject owns a stable tint from the
-student's own subject order, and a `SubjectMark` tile carries it into every list, card
-and row. Progress rings and bars take the subject's colour. One caveat shaped the
-design: three of the six tints pair with a near-black foreground, because those `-on`
-values are text colours for a pale panel, not graphic colours. Rings are therefore drawn
-on plain surfaces, where all six read cleanly, and tint panels are used where the
-design system intends them — as whole surfaces with their paired foreground.
+**A colour per subject, used everywhere.** Each subject owns one of three colours —
+`#9381ff`, `#7bf1a8`, `#ff5d8f` — assigned by position in the student's own subject
+list, so a subject looks the same in every list, card and row. Subjects are their own
+palette rather than one of the tint families, because a tint family pairs a pale panel
+with a text colour and that is not enough: a subject needs a solid fill for its mark, a
+stroke for its rings and bars, and a quiet ground for a whole panel. Three different
+contrast problems, so three sets of values, each measured rather than chosen:
+
+- The **fill** is the colour at full strength, and its text is near-black in both themes.
+  White fails 4.5:1 on all three of these hues; near-black clears it on all three.
+- The **stroke** is the colour itself in the dark theme. In the light theme it cannot be:
+  mint has luminance 0.70 and measures 1.40:1 against a white card, so a ring drawn in it
+  would be invisible. Deeper versions carry the strokes — but deeper *in the same hue*,
+  because mixing mint toward the ink turned it into a teal that no longer looked like the
+  mint tile beside it.
+- The **panel** ground is pale, because a saturated colour across an area that size is
+  what the design system warns against.
 
 **One calm sentence, chosen from real state.** Home shows a coach line picked by a pure,
 priority-ordered function over the on-track status, what was finished today and what was

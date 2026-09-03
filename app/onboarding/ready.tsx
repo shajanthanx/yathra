@@ -17,7 +17,7 @@ import { useOnboarding } from '@/screens/onboarding/OnboardingContext';
 import { OnboardingStep } from '@/screens/onboarding/OnboardingStep';
 import { completeOnboarding } from '@/store/appStore';
 import { useT, useTheme } from '@/theme/ThemeProvider';
-import { SUBJECT_TINT_ORDER } from '@/theme/tokens';
+
 
 export default function ReadyStep() {
   const theme = useTheme();
@@ -80,7 +80,7 @@ export default function ReadyStep() {
             <SubjectMark
               subjectId={id}
               size="md"
-              tint={SUBJECT_TINT_ORDER[index % SUBJECT_TINT_ORDER.length] ?? 'violet'}
+              palette={theme.subjects[index % theme.subjects.length]}
             />
             <Text variant="bodyMedium" style={{ flex: 1 }} numberOfLines={2}>
               {localize(getSubject(id).name)}

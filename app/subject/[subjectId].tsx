@@ -2,8 +2,10 @@
  * Subject detail: the syllabus, unit by unit, with a topic sheet that changes
  * a topic's status in one tap.
  *
- * The header is a tint panel in the subject's own colour — the one place the
- * `-on` foreground is exactly right, since that is what those tokens are for.
+ * The header is a whole panel in the subject's own colour, so it uses that
+ * colour's quiet `surface` rather than its fill — a saturated ground across an
+ * area that size is exactly what the design system warns against.
+ *
  * Units are numbered so a long syllabus stays navigable, and the status
  * control stays a wrapping chip group rather than a segmented control: four
  * Sinhala or Tamil status words will not fit four equal segments on a phone.
@@ -32,14 +34,13 @@ import {
   nextTopicStatus,
   STATUS_ORDER,
 } from '@/domain/progress';
-import { useLocalize, useSubjectName, useSubjectTint } from '@/hooks/useContent';
+import { useLocalize, useSubjectName, useSubjectPalette } from '@/hooks/useContent';
 import { useSubjectSummary } from '@/hooks/useProgress';
 import { useToday } from '@/hooks/useToday';
 import { percentValue } from '@/i18n/format';
 import { setTopicStatus } from '@/store/appStore';
 import { useTopicProgress } from '@/store/useStore';
 import { useT, useTheme } from '@/theme/ThemeProvider';
-import { tintPair } from '@/theme/tokens';
 import type { SyllabusTopic } from '@/types/content';
 
 export default function SubjectDetailScreen() {
@@ -49,7 +50,7 @@ export default function SubjectDetailScreen() {
   const today = useToday();
   const localize = useLocalize();
   const subjectName = useSubjectName();
-  const subjectTint = useSubjectTint();
+  const subjectPalette = useSubjectPalette();
   const progress = useTopicProgress();
   const { subjectId } = useLocalSearchParams<{ subjectId: string }>();
   const [openTopic, setOpenTopic] = useState<SyllabusTopic | null>(null);
@@ -60,7 +61,7 @@ export default function SubjectDetailScreen() {
 
   if (!valid || !syllabus) return <Redirect href="/(tabs)/subjects" />;
 
-  const pair = tintPair(theme.colors, subjectTint(subjectId));
+  const colours = subjectPalette(subjectId);
   const percent = percentValue(summary.progress);
   const openTopicStatus = openTopic ? getTopicStatus(progress, openTopic.id) : 'not_started';
 
@@ -133,28 +134,28 @@ export default function SubjectDetailScreen() {
           marginTop: theme.spacing.md,
           padding: theme.spacing.lg,
           borderRadius: theme.radius.xxxl,
-          backgroundColor: pair.background,
+          backgroundColor: colours.surface,
         }}
       >
         <ProgressRing
           value={summary.progress}
           size={88}
-          color={pair.foreground}
+          color={colours.graphic}
           trackColor={theme.colors.surfaceRaised}
           accessibilityLabel={t('a11y.progress', { value: percent })}
         >
-          <Text variant="heading" color={pair.foreground} maxFontSizeMultiplier={1.2}>
+          <Text variant="heading" color={colours.onSurface} maxFontSizeMultiplier={1.2}>
             {t('common.percent', { value: percent })}
           </Text>
         </ProgressRing>
 
         <View style={{ flex: 1 }}>
-          <Text variant="bodyMedium" color={pair.foreground}>
+          <Text variant="bodyMedium" color={colours.onSurface}>
             {t('common.of', { done: summary.completedTopics, total: summary.totalTopics })}
           </Text>
           <Text
             variant="caption"
-            color={pair.foreground}
+            color={colours.onSurface}
             style={{ marginTop: theme.spacing.xxs, opacity: 0.9 }}
           >
             {summary.focusTopic
@@ -164,7 +165,7 @@ export default function SubjectDetailScreen() {
           {syllabus.depth === 'units' ? (
             <Text
               variant="micro"
-              color={pair.foreground}
+              color={colours.onSurface}
               style={{ marginTop: theme.spacing.xs, opacity: 0.9 }}
             >
               {t('subject.unitsOnlyNote')}
@@ -224,7 +225,7 @@ export default function SubjectDetailScreen() {
 
             <ProgressBar
               value={unitProgress}
-              color={pair.foreground}
+              color={colours.onSurface}
               height={theme.sizes.progressBarThin}
               style={{ marginBottom: theme.spacing.xs }}
             />

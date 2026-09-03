@@ -131,7 +131,7 @@ export default function HomeScreen() {
                 {year ? t('home.journeyTitle', { year: year.examYear }) : t('common.appName')}
               </Text>
               {journey ? (
-                <Text variant="bodySm" color={theme.colors.onHeroMuted} style={{ marginTop: 2 }}>
+                <Text variant="bodySm" color={theme.colors.onHero} style={{ marginTop: 2 }}>
                   {journey.notStarted && year
                     ? t('home.journeyNotStarted', { date: formatDayMonth(t, year.journeyStart) })
                     : plural(t, 'home.journeyMonths', journey.monthsElapsed)}
@@ -145,11 +145,12 @@ export default function HomeScreen() {
                   borderWidth: 1,
                   borderColor: theme.colors.onHeroMuted,
                   borderRadius: theme.radius.full,
+                  backgroundColor: theme.colors.heroChipFill,
                   paddingVertical: theme.spacing.xxs,
                   paddingHorizontal: theme.spacing.sm,
                 }}
               >
-                <Text variant="micro" color={theme.colors.onHeroMuted}>
+                <Text variant="micro" color={theme.colors.onHero}>
                   {t('home.hero.examWindow', {
                     month: monthShort(t, dateParts(countdown.examStart).month),
                     year: dateParts(countdown.examStart).year,
@@ -168,7 +169,7 @@ export default function HomeScreen() {
                   </Text>
                   <Text
                     variant="bodyMedium"
-                    color={theme.colors.onHeroMuted}
+                    color={theme.colors.onHero}
                     style={{ marginLeft: theme.spacing.xs }}
                   >
                     {plural(t, 'home.countdown.daysLabel', countdown.daysLeft)}
@@ -185,7 +186,7 @@ export default function HomeScreen() {
               {countdown.isEstimated && countdown.phase === 'before' ? (
                 <Text
                   variant="micro"
-                  color={theme.colors.onHeroMuted}
+                  color={theme.colors.onHero}
                   style={{ marginTop: theme.spacing.xxs }}
                 >
                   {t('home.countdown.estimatedNote')}

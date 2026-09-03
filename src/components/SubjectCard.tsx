@@ -14,10 +14,9 @@
  */
 import { Pressable, type ViewStyle } from 'react-native';
 import type { SubjectProgressSummary } from '@/domain/progress';
-import { useSubjectName, useSubjectTint } from '@/hooks/useContent';
+import { useSubjectName, useSubjectPalette } from '@/hooks/useContent';
 import { percentValue } from '@/i18n/format';
 import { useT, useTheme } from '@/theme/ThemeProvider';
-import { tintPair } from '@/theme/tokens';
 import type { SubjectId } from '@/types/content';
 import { ProgressRing } from './ProgressRing';
 import { Text } from './Text';
@@ -33,9 +32,9 @@ export function SubjectCard({ summary, onPress, style, testID }: SubjectCardProp
   const theme = useTheme();
   const t = useT();
   const subjectName = useSubjectName();
-  const subjectTint = useSubjectTint();
+  const subjectPalette = useSubjectPalette();
 
-  const pair = tintPair(theme.colors, subjectTint(summary.subjectId));
+  const colours = subjectPalette(summary.subjectId);
   const name = subjectName(summary.subjectId, true);
   const percent = percentValue(summary.progress);
 
@@ -63,7 +62,7 @@ export function SubjectCard({ summary, onPress, style, testID }: SubjectCardProp
         value={summary.progress}
         size={theme.sizes.ringSm}
         thickness={6}
-        color={pair.foreground}
+        color={colours.graphic}
       >
         <Text variant="bodyMedium" maxFontSizeMultiplier={1.2}>
           {t('common.percent', { value: percent })}

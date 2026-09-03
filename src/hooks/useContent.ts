@@ -6,8 +6,8 @@ import { useCallback, useMemo } from 'react';
 import { findAcademicYear } from '@/data/academic-years';
 import { getStream, getSubject, getSyllabus } from '@/data/curriculum';
 import { localize } from '@/i18n';
-import { useLanguage } from '@/theme/ThemeProvider';
-import { SUBJECT_TINT_ORDER, type TintKey } from '@/theme/tokens';
+import { useLanguage, useTheme } from '@/theme/ThemeProvider';
+import type { SubjectPalette } from '@/theme/tokens';
 import { useProfile } from '@/store/useStore';
 import type { AcademicYear, LocalizedText, Stream, SubjectId, SubjectSyllabus } from '@/types/content';
 
@@ -59,18 +59,24 @@ export function useStream(): Stream | undefined {
 }
 
 /**
- * A stable tint per subject so a subject keeps the same colour everywhere.
- * Assigned by position in the student's own list, which keeps the palette to
- * the two or three tints the design system asks for on one screen.
+ * A stable colour per subject, so a subject looks the same everywhere.
+ *
+ * Assigned by position in the student's own subject list rather than by
+ * subject id: two students taking different subjects both get the first three
+ * colours, and a subject never changes colour while it stays in the list.
  */
-export function useSubjectTint(): (subjectId: SubjectId) => TintKey {
+export function useSubjectPalette(): (subjectId: SubjectId) => SubjectPalette {
+  const theme = useTheme();
   const subjectIds = useSelectedSubjectIds();
+
   return useCallback(
     (subjectId: SubjectId) => {
       const index = subjectIds.indexOf(subjectId);
       const position = index >= 0 ? index : 0;
-      return SUBJECT_TINT_ORDER[position % SUBJECT_TINT_ORDER.length] ?? 'violet';
+      const palette = theme.subjects[position % theme.subjects.length];
+      // The palette is never empty, but the index signature cannot know that.
+      return palette ?? theme.subjects[0]!;
     },
-    [subjectIds],
+    [subjectIds, theme.subjects],
   );
 }

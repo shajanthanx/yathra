@@ -25,7 +25,12 @@ import {
 } from '@/components';
 import { findTopic, topicsForSubject } from '@/data/curriculum';
 import { isSubjectId } from '@/data/curriculum/subject-ids';
-import { useLocalize, useSelectedSubjectIds, useSubjectName, useSubjectTint } from '@/hooks/useContent';
+import {
+  useLocalize,
+  useSelectedSubjectIds,
+  useSubjectName,
+  useSubjectPalette,
+} from '@/hooks/useContent';
 import { useStudyTimer } from '@/hooks/useStudyTimer';
 import { formatClock, formatMinutes, formatSeconds } from '@/i18n/format';
 import {
@@ -37,7 +42,6 @@ import {
 } from '@/store/appStore';
 import { useActiveSession } from '@/store/useStore';
 import { useT, useTheme } from '@/theme/ThemeProvider';
-import { tintPair } from '@/theme/tokens';
 import type { SubjectId } from '@/types/content';
 import { clamp01 } from '@/utils/date';
 
@@ -49,7 +53,7 @@ export default function StudyScreen() {
   const router = useRouter();
   const localize = useLocalize();
   const subjectName = useSubjectName();
-  const subjectTint = useSubjectTint();
+  const subjectPalette = useSubjectPalette();
   const selectedSubjects = useSelectedSubjectIds();
   const session = useActiveSession();
   const timer = useStudyTimer();
@@ -132,7 +136,7 @@ export default function StudyScreen() {
 
   // ---- running timer ----
   if (session && timer.isActive) {
-    const pair = tintPair(theme.colors, subjectTint(session.subjectId));
+    const colours = subjectPalette(session.subjectId);
     const swept =
       timer.plannedSeconds > 0 ? clamp01(timer.elapsed / timer.plannedSeconds) : timer.isRunning ? 1 : 0;
 
@@ -177,7 +181,7 @@ export default function StudyScreen() {
             value={swept}
             size={240}
             thickness={10}
-            color={pair.foreground}
+            color={colours.graphic}
             style={{ marginTop: theme.spacing.xxl }}
             accessibilityLabel={`${t('study.elapsed')} ${formatSeconds(t, timer.elapsed)}`}
           >

@@ -73,20 +73,24 @@ export const lightColors = {
    * predictable: it is high enough that the composite stays close to the
    * opaque gradient, and the illustration reads as atmosphere through it.
    */
-  heroScrimFrom: 'rgba(5, 0, 56, 0.82)',
-  heroScrimTo: 'rgba(59, 63, 143, 0.62)',
+  heroScrimFrom: 'rgba(5, 0, 56, 0.85)',
+  heroScrimTo: 'rgba(59, 63, 143, 0.42)',
+  /** Pill fill for a chip sitting over the brighter part of the artwork. */
+  heroChipFill: 'rgba(5, 0, 56, 0.45)',
   /**
    * The hero is dark in both themes, so onSurfaceInverse - which flips to dark
    * ink - cannot be used on it.
    *
-   * Both are measured against the composited pixels of the sky illustration
-   * under the scrim, not against a flat colour, by devtools/contrast.js over
-   * the region of the artwork that actually sits behind the hero's text. Worst
-   * case in the light theme: onHero 6.05:1, onHeroMuted 4.75:1; in the dark
-   * theme 9.70:1 and 7.62:1. onHeroMuted is deliberately lighter than a
-   * typical muted tone - it was the binding constraint on how far the scrim
-   * could be lowered, and therefore on whether the illustration was visible at
-   * all.
+   * Every piece of hero text uses onHero. onHeroMuted is deliberately not used
+   * for readable content there: over an illustration it was the binding
+   * constraint on how far the scrim could be lowered, and a scrim heavy enough
+   * to carry a dimmed tone hid the artwork completely. The hero's hierarchy is
+   * carried by size instead, which is what the design system asks for, and
+   * onHeroMuted is left for non-text edges where the 3:1 bar applies.
+   *
+   * Contrast is measured against the composited pixels of the illustration
+   * under the scrim - not against a flat colour - by devtools/contrast.js,
+   * over the region of the artwork that actually sits behind the text.
    */
   onHero: '#ffffff',
   onHeroMuted: '#e2e4e9',
@@ -149,8 +153,9 @@ export const darkColors: ColorTokens = {
   infoSoft: '#1e2140',
   heroFrom: '#1e2140',
   heroTo: '#141428',
-  heroScrimFrom: 'rgba(30, 33, 64, 0.80)',
-  heroScrimTo: 'rgba(20, 20, 40, 0.58)',
+  heroScrimFrom: 'rgba(30, 33, 64, 0.82)',
+  heroScrimTo: 'rgba(20, 20, 40, 0.35)',
+  heroChipFill: 'rgba(20, 20, 40, 0.45)',
   onHero: '#ffffff',
   onHeroMuted: '#e2e4e9',
 };
@@ -175,8 +180,94 @@ export function tintPair(colors: ColorTokens, tint: TintKey): { background: stri
   }
 }
 
-/** Order in which tints are handed to a student's selected subjects. */
-export const SUBJECT_TINT_ORDER: readonly TintKey[] = ['violet', 'teal', 'coral', 'amber', 'orange', 'rose'];
+/**
+ * The colour a subject carries through the whole app.
+ *
+ * Subjects are their own axis, not one of the tint families. Those families
+ * pair a pale panel with a text colour, and three of the six pair with a
+ * near-black foreground — fine for words on a panel, wrong for a ring or a
+ * bar. Subjects need a fill, a stroke and a panel, which is three values, so
+ * they get their own palette. An A/L student always sits exactly three
+ * subjects, so there are exactly three entries.
+ *
+ * Each field exists because it is a different contrast problem, and each pair
+ * below is measured, not chosen:
+ *
+ * - `fill` is the colour at full strength, used as a solid ground for the
+ *   subject's mark. `onFill` is near-black in both themes: white fails 4.5:1
+ *   on all three of these hues, near-black clears it on all three.
+ * - `graphic` draws thin strokes — progress rings and bars. In the dark theme
+ *   that is `fill` itself. In the light theme it cannot be: mint at luminance
+ *   0.70 measures 1.40:1 against a white card, so a ring drawn in it would be
+ *   invisible. A deeper version of the same hue carries the stroke instead,
+ *   which is the ordinary rule that a hairline needs more weight than a fill.
+ *   The deeper values keep their hue rather than being mixed toward the ink:
+ *   darkening mint that way turned it into a teal, which no longer looked like
+ *   the mint tile beside it. Each clears 4:1 on a white card, comfortably past
+ *   the 3:1 the design system asks of a graphic.
+ * - `surface` and `onSurface` are for a whole panel in the subject's colour,
+ *   where the fill would be far too loud across a large area.
+ */
+export interface SubjectPalette {
+  /** The colour at full strength, as a solid ground. */
+  fill: string;
+  /** Readable text on `fill`. */
+  onFill: string;
+  /** Thin strokes: progress rings and bars. */
+  graphic: string;
+  /** A quiet ground for a whole subject panel. */
+  surface: string;
+  /** Readable text on `surface`. */
+  onSurface: string;
+}
+
+export const lightSubjects: readonly SubjectPalette[] = [
+  {
+    fill: '#9381ff',
+    onFill: '#050038',
+    graphic: '#6d4df0',
+    surface: '#f1efff',
+    onSurface: '#6b5dc7',
+  },
+  {
+    fill: '#7bf1a8',
+    onFill: '#050038',
+    graphic: '#0f8a52',
+    surface: '#eefdf4',
+    onSurface: '#407870',
+  },
+  {
+    fill: '#ff5d8f',
+    onFill: '#050038',
+    graphic: '#d92662',
+    surface: '#ffeaf0',
+    onSurface: '#b44175',
+  },
+];
+
+export const darkSubjects: readonly SubjectPalette[] = [
+  {
+    fill: '#9381ff',
+    onFill: '#050038',
+    graphic: '#9381ff',
+    surface: '#2e2a48',
+    onSurface: '#9786ff',
+  },
+  {
+    fill: '#7bf1a8',
+    onFill: '#050038',
+    graphic: '#7bf1a8',
+    surface: '#294335',
+    onSurface: '#7bf1a8',
+  },
+  {
+    fill: '#ff5d8f',
+    onFill: '#050038',
+    graphic: '#ff5d8f',
+    surface: '#46232f',
+    onSurface: '#ff5d8f',
+  },
+];
 
 export const spacing = {
   xxs: 4,
@@ -313,6 +404,8 @@ export const elevation = {
 export interface Theme {
   scheme: 'light' | 'dark';
   colors: ColorTokens;
+  /** One entry per subject slot, in the student's own subject order. */
+  subjects: readonly SubjectPalette[];
   spacing: typeof spacing;
   radius: typeof radius;
   typography: typeof typography;
@@ -326,6 +419,7 @@ export interface Theme {
 export const lightTheme: Theme = {
   scheme: 'light',
   colors: lightColors,
+  subjects: lightSubjects,
   spacing,
   radius,
   typography,
@@ -339,6 +433,7 @@ export const lightTheme: Theme = {
 export const darkTheme: Theme = {
   scheme: 'dark',
   colors: darkColors,
+  subjects: darkSubjects,
   spacing,
   radius,
   typography,

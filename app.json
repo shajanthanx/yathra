@@ -19,6 +19,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
+
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -27,6 +28,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      
       "expo-router",
       [
         "expo-splash-screen",
